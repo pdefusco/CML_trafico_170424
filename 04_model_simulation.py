@@ -68,9 +68,9 @@ dg = DataGen(USERNAME, STORAGE, DBNAME, CONNECTION_NAME)
 spark = dg.createSparkConnection()
 
 # Create IoT Fleet DF
-df_desmoines = dg.dataGen(spark)
-df_desmoines = dg.addCorrelatedColumn(df_desmoines)
-df = df_desmoines.toPandas()
+df_medellin = dg.iotDataGen(spark)
+df_medellin = dg.addCorrelatedColumn(df_medellin)
+df = df_medellin.toPandas()
 
 # You can access all models with API V2
 client = cmlapi.default_client()

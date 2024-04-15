@@ -52,7 +52,6 @@ client = cmlapi.default_client()
 
 USERNAME = os.environ["PROJECT_OWNER"]
 TODAY = datetime.date.today()
-#model_name = f"MultiDimMotif-{USERNAME}-2024-03-14" # Update model name here
 model_name = f"TimeSeriesQuery-{USERNAME}"
 
 project_id = os.environ["CDSW_PROJECT_ID"]
