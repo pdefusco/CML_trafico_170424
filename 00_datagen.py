@@ -96,11 +96,13 @@ class DataGen:
             .withColumn("device_id", "string", format="0x%013x", baseColumn="internal_device_id")
             .withColumn("model_ser", "integer", minValue=1, maxValue=11, baseColumn="device_id", baseColumnType="hash", omit=True, )
             .withColumn("event_ts", "timestamp", begin="2023-12-01 01:00:00", end="2023-12-01 23:59:00", interval="1 minute", random=False )
-            .withColumn("longitude", "float", minValue=6.2456, maxValue=6.2496, random=True)
-            .withColumn("latitude", "float", minValue=-75.5629, maxValue=-75.5658, random=True)
+            .withColumn("longitude", "float", minValue=6.2, maxValue=6.3, random=True)
+            .withColumn("latitude", "float", minValue=-75.5, maxValue=-75.6, random=True)
             .withColumn("vehicles", "integer", minValue=10, maxValue=50, random=True)
             .withColumn("motorcycles", "integer", minValue=1, maxValue=10, random=True)
             .withColumn("pedestrians", "integer", minValue=100, maxValue=300, random=True)
+            .withColumn("traffic_condition", "string", values=["high congestion", "average traffic", "low traffic", "clear"], random=True)
+
         )
 
         df = iotDataSpec.build()
@@ -213,7 +215,7 @@ def main():
     dg.createDatabase(spark)
 
     # Create Iceberg Table in Database
-    dg.createOrReplace(df_desmoines)
+    dg.createOrReplace(df_medellin)
 
     # Validate Iceberg Table in Database
     dg.validateTable(spark)
