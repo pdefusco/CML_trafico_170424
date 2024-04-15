@@ -201,9 +201,9 @@ def main():
     # Create CML Spark Connection
     spark = dg.createSparkConnection()
 
-    dfTraffic = dg.trafficDataGen()
+    dfTraffic = dg.trafficDataGen(spark)
     dfTraffic = dg.addCorrelatedColumn(dfTraffic)
-    df_medellin = dg.iotDataGen()
+    df_medellin = dg.iotDataGen(spark)
     df_medellin = dg.addCorrelatedColumn(df_medellin)
 
     # Drop Spark Database if exists
