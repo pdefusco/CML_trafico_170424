@@ -52,7 +52,7 @@ from functools import reduce
 from pyspark.sql import DataFrame
 
 
-class IotDataGen:
+class DataGen:
 
     '''Class to Generate IoT Fleet Data'''
 
@@ -62,28 +62,47 @@ class IotDataGen:
         self.dbname = dbname
         self.connectionName = connectionName
 
-
-    def dataGen(self, spark, shuffle_partitions_requested = 1, partitions_requested = 1, data_rows = 1440):
+    def trafficDataGen(self, spark, shuffle_partitions_requested = 1, partitions_requested = 1, data_rows = 1440):
         """
         Method to create IoT fleet data in Spark Df
         """
-
-        manufacturers = ["New World Corp", "AI Inc.", "Hot Data Ltd"]
 
         iotDataSpec = (
             dg.DataGenerator(spark, name="device_data_set", rows=data_rows, partitions=partitions_requested)
             .withIdOutput()
             .withColumn("internal_device_id", "long", minValue=0x1000000000000, uniqueValues=int(data_rows/36), omit=True, baseColumnType="hash")
             .withColumn("device_id", "string", format="0x%013x", baseColumn="internal_device_id")
-            .withColumn("manufacturer", "string", values=manufacturers, baseColumn="internal_device_id", )
             .withColumn("model_ser", "integer", minValue=1, maxValue=11, baseColumn="device_id", baseColumnType="hash", omit=True, )
-            .withColumn("event_type", "string", values=["tank below 10%", "tank below 5%", "device error", "system malfunction"], random=True)
             .withColumn("event_ts", "timestamp", begin="2023-12-01 01:00:00", end="2023-12-01 23:59:00", interval="1 minute", random=False )
-            .withColumn("longitude", "float", expr="rand() + -93.6295")
-            .withColumn("latitude", "float", expr="rand() + 41.5949")
-            .withColumn("iot_signal_1", "integer", minValue=1, maxValue=10, random=True)
-            .withColumn("iot_signal_3", "integer", minValue=50, maxValue=55, random=True)
-            .withColumn("iot_signal_4", "integer", minValue=100, maxValue=107, random=True)
+            .withColumn("vehicles", "integer", minValue=10, maxValue=50, random=True)
+            .withColumn("motorcycles", "integer", minValue=1, maxValue=10, random=True)
+            .withColumn("pedestrians", "integer", minValue=100, maxValue=300, random=True)
+        )
+
+        df = iotDataSpec.build()
+
+        return df
+
+
+    def iotDataGen(self, spark, shuffle_partitions_requested = 1, partitions_requested = 1, data_rows = 1440):
+        """
+        Method to create IoT fleet data in Spark Df
+        """
+
+        iotDataSpec = (
+            dg.DataGenerator(spark, name="device_data_set", rows=data_rows, partitions=partitions_requested)
+            .withIdOutput()
+            .withColumn("internal_device_id", "long", minValue=0x1000000000000, uniqueValues=int(data_rows/36), omit=True, baseColumnType="hash")
+            .withColumn("device_id", "string", format="0x%013x", baseColumn="internal_device_id")
+            .withColumn("model_ser", "integer", minValue=1, maxValue=11, baseColumn="device_id", baseColumnType="hash", omit=True, )
+            .withColumn("event_ts", "timestamp", begin="2023-12-01 01:00:00", end="2023-12-01 23:59:00", interval="1 minute", random=False )
+            .withColumn("longitude", "float", expr="rand() + -75.4658")
+            .withColumn("latitude", "float", expr="rand() + 6.1476")
+            .withColumn("vehicles", "integer", minValue=10, maxValue=50, random=True)
+            .withColumn("motorcycles", "integer", minValue=1, maxValue=10, random=True)
+            .withColumn("pedestrians", "integer", minValue=100, maxValue=300, random=True)
+            .withColumn("traffic_condition", "string", values=["high congestion", "average traffic", "low traffic", "clear"], random=True)
+
         )
 
         df = iotDataSpec.build()
@@ -103,7 +122,7 @@ class IotDataGen:
           return (val)+random.randint(0, 2)
 
         udf_column = udf(addColUdf, IntegerType())
-        dataGenDf = dataGenDf.withColumn('iot_signal_2', udf_column('iot_signal_1'))
+        dataGenDf = dataGenDf.withColumn('trucks', udf_column('vehicles'))
 
         return dataGenDf
 
@@ -155,11 +174,11 @@ class IotDataGen:
         """
 
         try:
-            df.writeTo("{0}.IOT_FLEET_{1}".format(self.dbname, self.username))\
+            df.writeTo("{0}.trafico_{1}".format(self.dbname, self.username))\
               .using("iceberg").tableProperty("write.format.default", "parquet").append()
 
         except:
-            df.writeTo("{0}.IOT_FLEET_{1}".format(self.dbname, self.username))\
+            df.writeTo("{0}.trafico_{1}".format(self.dbname, self.username))\
                 .using("iceberg").tableProperty("write.format.default", "parquet").createOrReplace()
 
 

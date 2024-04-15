@@ -57,11 +57,11 @@ def predict(args):
     Returns the subsequence in the time series data that is closest to the provided Query pattern
     """
 
-    iotDf = pd.read_csv("data/iot_fleet_data.csv")
+    iotDf = pd.read_csv("data/traffic_events_medellin.csv")
 
     queryDf = pd.DataFrame(data=args, dtype=np.float64)
 
-    distance_profile = stumpy.mass(queryDf["pattern"], iotDf["iot_signal_3"])
+    distance_profile = stumpy.mass(queryDf["pattern"], iotDf["vehicles"])
     idx = np.argmin(distance_profile)
     print(f"The nearest neighbor to `Q_df` is located at index {idx} in `T_df`")
 

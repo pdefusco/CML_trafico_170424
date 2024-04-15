@@ -96,8 +96,8 @@ class DataGen:
             .withColumn("device_id", "string", format="0x%013x", baseColumn="internal_device_id")
             .withColumn("model_ser", "integer", minValue=1, maxValue=11, baseColumn="device_id", baseColumnType="hash", omit=True, )
             .withColumn("event_ts", "timestamp", begin="2023-12-01 01:00:00", end="2023-12-01 23:59:00", interval="1 minute", random=False )
-            .withColumn("longitude", "float", minValue=6.2, maxValue=6.3, random=True)
-            .withColumn("latitude", "float", minValue=-75.5, maxValue=-75.6, random=True)
+            .withColumn("longitude", "float", expr="rand() + -75.4658")
+            .withColumn("latitude", "float", expr="rand() + 6.1476")
             .withColumn("vehicles", "integer", minValue=10, maxValue=50, random=True)
             .withColumn("motorcycles", "integer", minValue=1, maxValue=10, random=True)
             .withColumn("pedestrians", "integer", minValue=100, maxValue=300, random=True)
@@ -220,8 +220,8 @@ def main():
     # Validate Iceberg Table in Database
     dg.validateTable(spark)
 
-    pdsTraffic = dfTraffic.toPandas()
-    pdsTraffic.to_csv("data/iot_fleet_data.csv", index=False)
+    pdsTraffic = df_medellin.toPandas()
+    pdsTraffic.to_csv("data/traffic_events_medellin.csv", index=False)
 
 if __name__ == '__main__':
     main()
